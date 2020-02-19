@@ -12,17 +12,22 @@ import { RulesetExceptionCollection } from '../types/ruleset';
 import { buildRulesetExceptionCollectionFrom } from '../../setupTests';
 
 const oasRuleset = JSON.parse(JSON.stringify(require('../rulesets/oas/index.json')));
+const aasRuleset = JSON.parse(JSON.stringify(require('../rulesets/aas/index.json')));
 const oasRulesetRules: Dictionary<IRunRule, string> = oasRuleset.rules;
+const aasRulesetRules: Dictionary<IRunRule, string> = aasRuleset.rules;
 
 describe('spectral', () => {
   describe('loadRuleset', () => {
-    test('should support loading built-in rulesets', async () => {
+    test.each([
+      ['spectral:oas', oasRulesetRules],
+      ['spectral:aas', aasRulesetRules],
+    ])('should support loading "%s" built-in ruleset', async (rulesetName, rules) => {
       const s = new Spectral();
-      await s.loadRuleset('spectral:oas');
+      await s.loadRuleset(rulesetName);
 
       expect(s.rules).toEqual(
         expect.objectContaining(
-          Object.entries(oasRulesetRules).reduce<Dictionary<IRunRule, string>>((oasRules, [name, rule]) => {
+          Object.entries(rules).reduce<Dictionary<IRunRule, string>>((oasRules, [name, rule]) => {
             oasRules[name] = {
               name,
               ...rule,
@@ -37,12 +42,15 @@ describe('spectral', () => {
       );
     });
 
-    test('should support loading multiple times the built-in ruleset', async () => {
+    test.each([
+      ['spectral:oas', oasRulesetRules],
+      ['spectral:aas', aasRulesetRules],
+    ])('should support loading multiple times the built-in ruleset "%s"', async (rulesetName, expectedRules) => {
       const s = new Spectral();
-      await s.loadRuleset(['spectral:oas', 'spectral:oas']);
+      await s.loadRuleset([rulesetName, rulesetName]);
 
       expect(s.rules).toEqual(
-        Object.entries(oasRulesetRules).reduce<Dictionary<IRunRule, string>>((oasRules, [name, rule]) => {
+        Object.entries(expectedRules).reduce<Dictionary<IRunRule, string>>((oasRules, [name, rule]) => {
           oasRules[name] = {
             name,
             ...rule,
