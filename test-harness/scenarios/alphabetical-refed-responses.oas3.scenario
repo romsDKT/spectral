@@ -1,0 +1,47 @@
+====test====
+Referenced can be sorted alphabetically
+====document====
+openapi: 3.0.2
+info:
+  title: Test Spec
+  version: 0.0.0
+paths:
+  /foo:
+    get:
+      operationId: get-foo
+      responses:
+        '404':
+          description: ''
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/foo'
+components:
+  schemas:
+    foo:
+      title: More incorrect casing
+      type: object
+      properties:
+        id:
+          type: integer
+        bar:
+          type: string
+====asset:ruleset====
+rules:
+  response-order:
+    message: Responses should be in alphabetical order
+    recommended: true
+    given: $.paths.*.*.responses
+    then:
+      function: alphabetical
+====command====
+{bin} lint {document} --ruleset {asset:ruleset}
+====stdout====
+OpenAPI 3.x detected
+
+{document}
+ 10:15  warning  response-order  Responses should be in alphabetical order
+
+✖ 1 problem (0 errors, 1 warning, 0 infos, 0 hints)

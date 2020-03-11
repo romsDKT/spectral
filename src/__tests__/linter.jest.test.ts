@@ -1,6 +1,8 @@
 import { normalize } from '@stoplight/path';
 import { DiagnosticSeverity } from '@stoplight/types';
 import * as path from 'path';
+import { Parsers } from '..';
+import { Document } from '../document';
 import { httpAndFileResolver } from '../resolvers/http-and-file';
 import { Spectral } from '../spectral';
 
@@ -169,5 +171,50 @@ describe('Linter', () => {
         ]),
       );
     });
+  });
+
+  it('alphabetical', async () => {
+    spectral.setRules({
+      'response-order': {
+        message: 'Responses should be in alphabetical order',
+        given: '$.paths.*.*.responses',
+        then: {
+          function: 'alphabetical',
+        },
+      },
+    });
+
+    const document = new Document(
+      `openapi: 3.0.2
+info:
+  title: Test Spec
+  version: 0.0.0
+paths:
+  /foo:
+    get:
+      operationId: get-foo
+      responses:
+        '404':
+          description: ''
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/foo'
+components:
+  schemas:
+    foo:
+      title: More incorrect casing
+      type: object
+      properties:
+        id:
+          type: integer
+        bar:
+          type: string`,
+      Parsers.Yaml,
+    );
+
+    expect(await spectral.run(document)).toEqual([{}]);
   });
 });

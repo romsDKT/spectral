@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "packages": {
+    "@stoplight/json": {
+      "signature": "e659a9864a693b77c7cb6026a0df33bf",
+      "file": true,
+      "replaced": "^3.4.0"
+    },
+    "@stoplight/yaml": {
+      "signature": "1c9934268a8957381b7c2bf381ed7d05",
+      "file": true,
+      "replaced": "^3.5.0"
+    }
+  }
+}
